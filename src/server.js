@@ -1,12 +1,4 @@
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load environment variables - look in backend directory
-dotenv.config({ path: join(__dirname, "../.env") });
+import "./config/env.js";
 
 import express from "express";
 import cors from "cors";
@@ -22,7 +14,10 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:5173",
+      "https://lernx-frontend-9de7.vercel.app/",
+    ],
     credentials: true,
   })
 );
