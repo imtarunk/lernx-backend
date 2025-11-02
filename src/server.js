@@ -14,10 +14,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_URL || "http://localhost:5173",
-      "https://lernx-frontend-9de7.vercel.app/",
-    ],
+    origin: true,
     credentials: true,
   })
 );
