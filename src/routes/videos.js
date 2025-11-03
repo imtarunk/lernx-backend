@@ -289,4 +289,43 @@ router.get("/share/:token", async (req, res, next) => {
   }
 });
 
+/**
+ * DELETE /api/videos/:id
+ * Delete a specific video (only owner)
+ */
+router.delete("/:id", verifyToken, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+
+    // Ensure the video exists and belongs to the user
+    const { data: existing, error: fetchError } = await supabase
+      .from("videos")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", user_id)
+      .single();
+
+    if (fetchError || !existing) {
+      return res
+        .status(404)
+        .json({ error: "Video not found or access denied" });
+    }
+
+    const { error: deleteError } = await supabase
+      .from("videos")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user_id);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
