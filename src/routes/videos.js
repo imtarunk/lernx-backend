@@ -266,6 +266,40 @@ router.get("/:id", verifyToken, async (req, res, next) => {
 });
 
 /**
+ * PATCH /api/videos/:id/public
+ * Toggle a video's public visibility (owner only)
+ */
+router.patch("/:id/public", verifyToken, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+    const { is_public } = req.body || {};
+
+    if (typeof is_public !== "boolean") {
+      return res.status(400).json({ error: "is_public must be boolean" });
+    }
+
+    const { data: updated, error } = await supabase
+      .from("videos")
+      .update({ is_public })
+      .eq("id", id)
+      .eq("user_id", user_id)
+      .select("*")
+      .single();
+
+    if (error || !updated) {
+      return res
+        .status(404)
+        .json({ error: "Video not found or access denied" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * GET /api/videos/share/:token
  * Get video by share token (public access)
  */
